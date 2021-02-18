@@ -1,10 +1,10 @@
-package com.assingment1.cloud;
+package com.cloud.assignment2;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CloudApplicationTests {
+class Assignment2ApplicationTests {
 
     @Test
     void contextLoads() {
