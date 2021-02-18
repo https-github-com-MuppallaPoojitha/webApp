@@ -2,7 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+# removing .md ,-iml and cmd files 
+*.cmd
+mvnw
+*.iml
 # C extensions
 *.so
 ## Maven:
