@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+#.md and cmd files 
+*.md
+*.cmd
+mvnw
 
 # C extensions
 *.so
