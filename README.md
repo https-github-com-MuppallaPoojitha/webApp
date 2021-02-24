@@ -26,6 +26,7 @@ This is a basic web app with user creation, user information update and get user
 3. <code>$ mvn clean install</code> to build the project.
 4. <code>$ java -jar target/webappone-0.0.1-SNAPSHOT.jar</code> to execute the application.
 5. Run the command to build the module:mvn clean Install
+4. <code>$ mvn spring-boot:run</code> to execute the application.
 
 
 
