@@ -6,13 +6,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
-
+/**
+ * Basic pojo class that defines the Book object.
+ */
 @Data
 @Entity
 @NoArgsConstructor
@@ -33,6 +35,11 @@ public class Book {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String user_id; // readOnly
 
+    @OneToMany(cascade=CascadeType.ALL, orphanRemoval=true, mappedBy = "book")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<File> book_images; // readOnly
+
+
     @JsonCreator
     public Book(String title, String author, String isbn, String published_date) {
         this.id = UUID.randomUUID().toString();
@@ -40,13 +47,26 @@ public class Book {
         this.author = author;
         this.isbn = isbn;
         this.published_date = published_date;
+        this.book_images = new ArrayList<File>();
+    }
+
+    public void addImage(File file) {
+        this.book_images.add(file);
+    }
+
+    public void removeImage(String imgId) {
+        for (File f : book_images) {
+            if (f.getFileId().equals(imgId)) {
+                this.book_images.remove(f);
+            }
+        }
     }
 
     /**
      * This method serialize a Book object to a map.
      */
-    public HashMap<String, String> serializeToMap() {
-        HashMap<String, String> res = new HashMap<>();
+    public HashMap<String, Object> serializeToMap() {
+        HashMap<String, Object> res = new HashMap<>();
         res.put("id", id);
         res.put("title", title);
         res.put("author", author);
@@ -54,7 +74,9 @@ public class Book {
         res.put("published_date", published_date);
         res.put("book_created", book_created);
         res.put("user_id", user_id);
+        res.put("book_images", book_images);
         return res;
     }
-
 }
+
+
