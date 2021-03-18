@@ -33,6 +33,7 @@ jobs:
       #  cd webappone
       - name: Build Artifact
         run: |
+          pwd
           ls -al
       
           mvn clean install
