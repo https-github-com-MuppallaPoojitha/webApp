@@ -29,11 +29,12 @@ jobs:
         id: vars
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
-      # Build
+      # Builds
+      #  cd webappone
       - name: Build Artifact
         run: |
           ls -al
-        #  cd webappone
+      
           mvn clean install
 
       # Install Packages
