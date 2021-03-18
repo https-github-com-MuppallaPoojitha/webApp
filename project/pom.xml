@@ -6,16 +6,16 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.4.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.cloud</groupId>
-    <artifactId>assignment2</artifactId>
+    <groupId>neu.csye6225</groupId>
+    <artifactId>webappone</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>assignment2</name>
-    <description>Demo project for Spring Boot</description>
+    <name>webappone</name>
+    <description>Spring Boot Web App</description>
     <properties>
+        <skip.it>true</skip.it>
         <java.version>11</java.version>
-        <skip.it>false</skip.it>
+        <amazon-sdk.version>1.11.465</amazon-sdk.version>
     </properties>
     <dependencies>
         <dependency>
@@ -41,18 +41,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-aws</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -99,9 +87,10 @@
             <artifactId>spring-cloud-aws-messaging</artifactId>
             <version>2.2.5.RELEASE</version>
         </dependency>
-    </dependencies>
 
+    </dependencies>
     <build>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

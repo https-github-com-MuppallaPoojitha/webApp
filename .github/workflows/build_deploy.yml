@@ -1,82 +1,89 @@
-name: Build and Deploy Webapp
+name: CSYE6220 webapp Build & Deploy
+
+env:
+  ARTIFACT_NAME: csye6225-webapp-${{ github.sha }}.zip
+  CODEDEPLOY_APPLICATION_NAME: csye6225-webapp
+  CODEDEPLOY_APPLICATION_GROUP_NAME: csye6225-webapp-deployment
+  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+  AWS_REGION: ${{secrets.AWS_REGION}}
+  DB_USERNAME: ${{secrets.DB_USERNAME}}
+  DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+  DB_ENDPOINT: ${{secrets.DB_ENDPOINT}}
+  DB_DATABASE: ${{secrets.DB_DATABASE}}
+  S3_CODEDEPLOY_BUCKET: ${{secrets.S3_CODEDEPLOY_BUCKET}}
+  S3_WEBAPP_BUCKET: ${{secrets.S3_WEBAPP_BUCKET}}
+
+
 
 on:
   push:
-    branches: [ main ]
-
-  workflow_dispatch:
+    branches: [ master ]
 
 jobs:
-  build_deploy:
-
-    # runner
+  ci_cd:
     runs-on: ubuntu-latest
 
     steps:
-
-      # checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # Java JDK 11
+      - uses: actions/checkout@v2
       - name: set JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 11.0.4
 
-      # Set up sha_short variable
-      - name: Set sha_short
-        id: vars
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-
-      # Build
-      - name: Build Artifact
+      - name: Build package
         run: |
-          cd webappone
+          cd project
           mvn clean install
 
-      # Install Packages
-      - name: Install apt & zip
+      - name: Install zip
         run: sudo apt-get update && sudo apt-get install wget zip unzip -y
 
-      # AWS CLI pre-installed in Ubuntu-Latest
+      - name: Build Deployment Artifact
+        run: |
+          mkdir codedeploy_artifact
+          
+          zip -r ${{ env.ARTIFACT_NAME }} project/target/ROOT.jar codedeploy/*.sh appspec.yml
+          pwd
+          ls -al
+          mv ${{ env.ARTIFACT_NAME }} codedeploy_artifact
+          ls -al
+          pwd
+          cd codedeploy_artifact
+          pwd
 
+          ls -al
+          cd ..
+          pwd
+          ls -al
+          cd project
+          pwd
+          ls -al
+          cd ..
+          
       # AWS Credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{env.AWS_REGION}}
 
-      # Zip Artifact
-      - name: Zip Artifact
+      - name: Copy Artifact to S3
         run: |
-          mkdir codedeploy_artifact
-          zip -r webapp-${{ steps.vars.outputs.sha_short }}.zip \
-          ./webappone/target/webappone-0.0.1-SNAPSHOT.jar ./codedeploy/*.sh appspec.yml
-          mv webapp-${{ steps.vars.outputs.sha_short }}.zip ./codedeploy_artifact
+          aws s3 sync ./codedeploy_artifact s3://${{secrets.S3_CODEDEPLOY_BUCKET}}
 
-      # Upload Artifacts to S3
-      - name: Upload Artifacts
-        run: |
-          aws s3 sync ./codedeploy_artifact s3://${{ secrets.S3_BUCKET_NAME }}
-
-
-      # Deploy Artifact to EC2
-      - name: Deploy Webapp
+      - name: CodeDeploy API call
         run: |
           output=$(aws deploy create-deployment \
-          --application-name "csye6225-webapp" \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --deployment-group-name "csye6225-webapp-deployment" \
-          --description "deploy webapp" \
-          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=webapp-${{ steps.vars.outputs.sha_short }}.zip \
-          --region us-east-1 \
-          --output json)
-
+              --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} \
+              --deployment-config-name CodeDeployDefault.AllAtOnce \
+              --deployment-group-name ${{ env.CODEDEPLOY_APPLICATION_GROUP_NAME }}\
+              --description "CSYE6225 - CodeDeploy" \
+              --s3-location bucket=${{ secrets.S3_CODEDEPLOY_BUCKET }},key=${{ env.ARTIFACT_NAME }},bundleType=zip \
+              --region ${{ env.AWS_REGION }}\
+              --output json)
           echo $output
-
           dId=$(echo $output | jq -r '.deploymentId')
 
           aws deploy wait deployment-successful --deployment-id $dId
