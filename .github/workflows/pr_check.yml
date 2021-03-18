@@ -1,32 +1,33 @@
-name: Unit Test on PR
-
+name: Pre Unit Test
+env:
+  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+  AWS_REGION: ${{secrets.AWS_REGION}}
+  DB_USERNAME: ${{secrets.DB_USERNAME}}
+  DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+  DB_ENDPOINT: ${{secrets.DB_ENDPOINT}}
+  DB_DATABASE: ${{secrets.DB_DATABASE}}
+  S3_CODEDEPLOY_BUCKET: ${{secrets.S3_CODEDEPLOY_BUCKET}}
+  S3_WEBAPP_BUCKET: ${{secrets.S3_WEBAPP_BUCKET}}
 on:
-  pull_request:
-    branches: [ master ]
-
-  workflow_dispatch:
+  push:
+    branches: [ 'master' ]
 
 jobs:
-  pr_check:
-
-    # runner
+  pre_test:
     runs-on: ubuntu-latest
 
     steps:
-
-      # checkout repository
       - name: Checkout repository
         uses: actions/checkout@v2
-      
+
       # Java JDK 11
       - name: set JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 11.0.4
 
-      # Run Tests
-      - name: Run all Tests
+      - name: test project
+
         run: |
-          cd webappone
           mvn test
-          cd ..
