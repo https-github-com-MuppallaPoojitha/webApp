@@ -42,6 +42,7 @@ jobs:
       - name: Build Deployment Artifact
         run: |
           mkdir codedeploy_artifact
+          
           zip -r ${{ env.ARTIFACT_NAME }} project/target/ROOT.war codedeploy/*.sh appspec.yml
           pwd
           ls -al
@@ -50,10 +51,16 @@ jobs:
           pwd
           cd codedeploy_artifact
           pwd
+
           ls -al
           cd ..
           pwd
           ls -al
+          cd project
+          pwd
+          ls -al
+          cd ..
+          
       # AWS Credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
