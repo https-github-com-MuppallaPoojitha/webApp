@@ -30,4 +30,6 @@ jobs:
       - name: test project
 
         run: |
+      
+        cd webappone
           mvn test

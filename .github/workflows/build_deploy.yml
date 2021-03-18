@@ -33,6 +33,7 @@ jobs:
 
       - name: Build package
         run: |
+        cd webappone
           mvn clean install
 
       - name: Install zip
