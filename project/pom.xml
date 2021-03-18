@@ -13,6 +13,7 @@
     <name>webappone</name>
     <description>Spring Boot Web App</description>
     <properties>
+        <skip.it>true</skip.it>
         <java.version>11</java.version>
         <amazon-sdk.version>1.11.465</amazon-sdk.version>
     </properties>
@@ -89,6 +90,7 @@
 
     </dependencies>
     <build>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
