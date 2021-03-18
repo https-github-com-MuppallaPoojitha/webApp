@@ -1,0 +1,32 @@
+name: Unit Test on PR
+
+on:
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  pr_check:
+
+    # runner
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      # Java JDK 11
+      - name: set JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11.0.4
+
+      # Run Tests
+      - name: Run all Tests
+        run: |
+          cd webappone
+          mvn test
+          cd ..
