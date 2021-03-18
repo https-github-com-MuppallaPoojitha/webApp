@@ -46,9 +46,21 @@ A complete API test script can be found on [here](https://www.postman.com/viobai
 
 ### Application Endpoints
 1.Register a User :http://localhost:8080/v1/user  (No auth required)
+
+
 2.Get user Details: http://localhost:8080/v1/user/self   (Basic Auth Required)
+
+
 3.Update User Details: http://localhost:8080/v1/user/self (Basic Auth Required)
+
+
 4.Create a Book: http://localhost:8080/books  (Basic Auth required)
+
+
 5.Get all Books: http://localhost:8080/books.(No AUTH REQUIRED)
+
+
 6.Get a Book by id:  http://localhost:8080/books/{id} (No auth Required)
+
+
 7.Delete a book: http://localhost:8080/books/{id}   (Basic Auth required)
