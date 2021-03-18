@@ -42,7 +42,7 @@ This web app uses [basic authentication](https://en.wikipedia.org/wiki/Basic_acc
 
 All test cases are written with Mockito and jUnit. They can be found under the '/src' folder. 
 
-A complete API test script can be found on [here](https://www.postman.com/viobai/workspace/csye6225-webapp/documentation/14507754-930e1511-15dc-4cfb-88e4-a6ad19ae331f) with Postman.
+
 
 ### Application Endpoints
 1.Register a User :http://localhost:8080/v1/user  (No auth required)
