@@ -35,7 +35,7 @@ jobs:
         run: |
           pwd
           ls -al
-          cd webappone
+          cd /webApp/webappone 
           mvn clean install
 
       # Install Packages
