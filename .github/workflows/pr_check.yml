@@ -7,6 +7,7 @@ env:
   DB_PASSWORD: ${{secrets.DB_PASSWORD}}
   DB_ENDPOINT: ${{secrets.DB_ENDPOINT}}
   DB_DATABASE: ${{secrets.DB_DATABASE}}
+  DEV_TEST: ${{secrets.DEV_TEST}}
   S3_CODEDEPLOY_BUCKET: ${{secrets.S3_CODEDEPLOY_BUCKET}}
   S3_WEBAPP_BUCKET: ${{secrets.S3_WEBAPP_BUCKET}}
 on:
@@ -30,6 +31,5 @@ jobs:
       - name: test project
 
         run: |
-      
-        cd webappone
+          cd webappone
           mvn test
