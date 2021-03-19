@@ -37,7 +37,8 @@ jobs:
           mvn clean install
 
       - name: Install zip
-        run: sudo apt-get update && sudo apt-get install wget zip unzip -y
+        run: |
+          sudo apt-get update && sudo apt-get install wget zip unzip -y
 
       - name: Build Deployment Artifact
         run: |
