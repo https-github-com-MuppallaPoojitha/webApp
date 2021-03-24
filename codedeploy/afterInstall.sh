@@ -12,3 +12,5 @@
 # sudo rm -rf /var/lib/tomcat9/logs/*.txt
 
 sudo kill -9 `sudo lsof -t -i:8080`
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ubuntu/cloudwatch_config.json -s
+sudo systemctl start amazon-cloudwatch-agent

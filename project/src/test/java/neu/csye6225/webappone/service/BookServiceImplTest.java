@@ -1,5 +1,6 @@
 package neu.csye6225.webappone.service;
 
+import com.timgroup.statsd.StatsDClient;
 import neu.csye6225.webappone.dao.BookDao;
 import neu.csye6225.webappone.dao.UserDao;
 import neu.csye6225.webappone.pojo.Book;
@@ -38,6 +39,8 @@ public class BookServiceImplTest {
 
     @MockBean
     private BookDao bookDao;
+    @MockBean
+    private StatsDClient statsd;
 
     private Book book = new Book("Computer Networks",
             "Andrew S. Tanenbaum", "978-0132126953", "May, 2020");

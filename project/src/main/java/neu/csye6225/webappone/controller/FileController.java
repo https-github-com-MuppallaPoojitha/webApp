@@ -1,6 +1,7 @@
 package neu.csye6225.webappone.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.timgroup.statsd.StatsDClient;
 import neu.csye6225.webappone.pojo.Book;
 import neu.csye6225.webappone.pojo.File;
 import neu.csye6225.webappone.service.BookService;
@@ -9,6 +10,8 @@ import neu.csye6225.webappone.service.S3FileService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
 import neu.csye6225.webappone.utils.validation.BookRequestBodyValidator;
 import neu.csye6225.webappone.utils.validation.FileValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +41,10 @@ public class FileController {
     private UserAuthorization userAuthorization;
     @Autowired
     private FileValidator fileValidator;
+    @Autowired
+    private StatsDClient statsd;
 
+    private Logger logger = LoggerFactory.getLogger(FileController.class);
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
 
@@ -51,18 +57,23 @@ public class FileController {
     ResponseEntity<?> uploadImage(
             @PathVariable("bookId") String bookId, @RequestParam(value = "file") MultipartFile file,
             HttpServletRequest request){
+        long startTime = System.currentTimeMillis();
+        statsd.increment("Calls - Post File");
+        logger.info("Calling Post File");
         HashMap<String, String> errMsg = new HashMap<>();
 
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
         if (!authResult.get("status").equals("200")) {
+            statsd.recordExecutionTime("Api Response Time - Post File",System.currentTimeMillis() - startTime);
             return noAuthResponse(authResult);
         }
 
         // check for book id validity
         Book book = bookService.findById(bookId);
         if (book == null) {
+            statsd.recordExecutionTime("Api Response Time - Post File",System.currentTimeMillis() - startTime);
             errMsg.put("error", "There is no book found with id " + bookId);
             return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
         }
@@ -70,6 +81,7 @@ public class FileController {
         // check for file input
         HashMap<String, String> fileCheckResult = fileValidator.checkForPost(book.getBook_images(), file);
         if (fileCheckResult.containsKey("error")) {
+            statsd.recordExecutionTime("Api Response Time - Post File",System.currentTimeMillis() - startTime);
             return new ResponseEntity<>(fileCheckResult, HttpStatus.BAD_REQUEST);
         }
         File tmpFile = new File(fileCheckResult.get("fileName"), authResult.get("id"), bookId,
@@ -78,6 +90,7 @@ public class FileController {
         // upload image to s3
         HashMap<String, String> s3UploadResult = s3FileService.uploadFile(tmpFile.getS3_object_name(), file);
         if (!s3UploadResult.containsKey("ok")) {
+            statsd.recordExecutionTime("Api Response Time - Post File",System.currentTimeMillis() - startTime);
             return new ResponseEntity<>(s3UploadResult, HttpStatus.BAD_REQUEST);
         }
 
@@ -86,6 +99,7 @@ public class FileController {
         book.addImage(tmpFile);
         bookService.save(book);
         HashMap<String, String> response = tmpFile.serializeToMap();
+        statsd.recordExecutionTime("Api Response Time - Post File",System.currentTimeMillis() - startTime);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -96,10 +110,14 @@ public class FileController {
     @DeleteMapping("/{bookId}/image/{imgId}")
     public ResponseEntity<?> deleteImageById(HttpServletRequest request, @PathVariable String bookId,
                                              @PathVariable String imgId) {
+        long startTime = System.currentTimeMillis();
+        statsd.increment("Calls - Delete File");
+        logger.info("Calling Delete File");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
         if (!authResult.get("status").equals("200")) { // if auth is invalid
+            statsd.recordExecutionTime("Api Response Time - Delete File",System.currentTimeMillis() - startTime);
             return noAuthResponse(authResult);
         }
 
@@ -108,24 +126,29 @@ public class FileController {
         HashMap<String, String> errMsg = new HashMap<>();
         if (book == null) {
             errMsg.put("error", "There is no book found with id " + bookId);
+            statsd.recordExecutionTime("Api Response Time - Delete File",System.currentTimeMillis() - startTime);
             return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
         } else {
             // check image in the database
             File uploadedFile = fileService.findByFileId(imgId);
             if (uploadedFile == null) {
                 errMsg.put("error", "This image does not exist.");
+                statsd.recordExecutionTime("Api Response Time - Delete File",System.currentTimeMillis() - startTime);
                 return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
             } else if (!uploadedFile.getUser_id().equals(authResult.get("id"))) { // attempt not from original user
                 errMsg.put("error", "This image is not uploaded by you.");
+                statsd.recordExecutionTime("Api Response Time - Delete File",System.currentTimeMillis() - startTime);
                 return new ResponseEntity<>(errMsg, HttpStatus.UNAUTHORIZED);
             }
             // delete image from s3
             HashMap<String, String> s3DeleteResult = s3FileService.deleteFile(bookId + "/" + imgId);
             if (!s3DeleteResult.containsKey("ok")) {
+                statsd.recordExecutionTime("Api Response Time - Delete File",System.currentTimeMillis() - startTime);
                 return new ResponseEntity<>(s3DeleteResult, HttpStatus.BAD_REQUEST);
             }
             // delete image meta data from rds
             fileService.deleteByFileId(imgId);
+            statsd.recordExecutionTime("Api Response Time - Delete File",System.currentTimeMillis() - startTime);
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         }
     }

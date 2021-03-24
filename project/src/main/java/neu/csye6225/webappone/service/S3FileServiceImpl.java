@@ -3,6 +3,7 @@ package neu.csye6225.webappone.service;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.timgroup.statsd.StatsDClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class S3FileServiceImpl implements  S3FileService {
     private AmazonS3 s3client;
     @Value("${s3.bucketName}")
     private String bucketName;
+    @Autowired
+    private StatsDClient statsd;
 
     /**
      * Delete image inside S3 bucket.
@@ -29,6 +32,7 @@ public class S3FileServiceImpl implements  S3FileService {
     @Override
     public HashMap<String, String> deleteFile(String s3_object_name) {
         HashMap<String, String> deleteRes = new HashMap<>();
+        long startTime = System.currentTimeMillis();
         try {
             s3client.deleteObject(bucketName,s3_object_name);
             deleteRes.put("ok","");
@@ -41,6 +45,7 @@ public class S3FileServiceImpl implements  S3FileService {
             deleteRes.put("Error", "Amazon Client Exception");
             deleteRes.put("Error Content", ace.getMessage());
         }
+        statsd.recordExecutionTime("S3 Response Time - Delete File", System.currentTimeMillis() - startTime);
         return deleteRes;
     }
 
@@ -51,6 +56,7 @@ public class S3FileServiceImpl implements  S3FileService {
     public HashMap<String, String> uploadFile(String s3_object_name, MultipartFile uploadedFile) {
         HashMap<String, String> uploadRes = new HashMap<>();
         File file = null;
+        long startTime = System.currentTimeMillis();
         try {
             file = multipartToFile(uploadedFile);
             s3client.putObject(bucketName, s3_object_name, file);
@@ -66,6 +72,7 @@ public class S3FileServiceImpl implements  S3FileService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        statsd.recordExecutionTime("S3 Response Time - Upload File", System.currentTimeMillis() - startTime);
         return uploadRes;
     }
 

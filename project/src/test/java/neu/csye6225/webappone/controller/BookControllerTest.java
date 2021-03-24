@@ -1,6 +1,7 @@
 package neu.csye6225.webappone.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.timgroup.statsd.StatsDClient;
 import neu.csye6225.webappone.pojo.Book;
 import neu.csye6225.webappone.pojo.User;
 import neu.csye6225.webappone.service.BookService;
@@ -45,6 +46,8 @@ public class BookControllerTest {
     private UserAuthorization userAuthorization;
     @MockBean
     private BookRequestBodyValidator bookRequestBodyValidator;
+    @MockBean
+    private StatsDClient statsd;
 
     private User user = new User("Jane", "Doe", "janeDoe@example.com", "12345aA!");
     private Book book = new Book("Computer Networks",
