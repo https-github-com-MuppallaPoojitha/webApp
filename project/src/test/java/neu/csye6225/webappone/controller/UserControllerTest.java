@@ -1,6 +1,7 @@
 package neu.csye6225.webappone.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.timgroup.statsd.StatsDClient;
 import neu.csye6225.webappone.pojo.User;
 import neu.csye6225.webappone.service.UserService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
@@ -37,6 +38,8 @@ public class UserControllerTest {
     private UserAuthorization userAuthorization;
     @MockBean
     private UserRequestBodyValidator userRequestBodyValidator;
+    @MockBean
+    private StatsDClient statsd;
 
     private User user = new User("Jane", "Doe", "janeDoe@example.com", "12345aA!");
     HashMap<String, String> authRes = new HashMap<>();
