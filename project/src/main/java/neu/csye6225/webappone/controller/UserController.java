@@ -45,7 +45,7 @@ public class UserController {
     @GetMapping(value = "/v1/user/self", produces = "application/json")
     public @ResponseBody ResponseEntity<?> getUserInfo(HttpServletRequest request) {
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Get User");
+        statsd.incrementCounter("Calls - Get User");
         logger.info("Cing Get User");
         // check for authorization
         String header = request.getHeader("Authorization");
@@ -73,7 +73,7 @@ public class UserController {
     public @ResponseBody ResponseEntity<?> updateUser(HttpServletRequest request, @RequestBody String jsonUser)
             throws JsonProcessingException {
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Put User");
+        statsd.incrementCounter("Calls - Put User");
         logger.info("Calling Put User");
         // check for authorization
         String header = request.getHeader("Authorization");
@@ -130,7 +130,7 @@ public class UserController {
     @PostMapping(value = "/v1/user", produces = "application/json", consumes = "application/json")
     public @ResponseBody ResponseEntity<?> registerUser(@RequestBody String jsonUser) throws JsonProcessingException {
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Post User");
+        statsd.incrementCounter("Calls - Post User");
         logger.info("Calling Post User");
         // converts inputted user information from JSON to HashMap
         HashMap<String, String> mapUser = new ObjectMapper().readValue(jsonUser, new TypeReference<>(){});
