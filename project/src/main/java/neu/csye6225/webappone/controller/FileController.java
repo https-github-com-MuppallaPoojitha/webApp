@@ -58,7 +58,7 @@ public class FileController {
             @PathVariable("bookId") String bookId, @RequestParam(value = "file") MultipartFile file,
             HttpServletRequest request){
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Post File");
+        statsd.incrementCounter("Calls - Post File");
         logger.info("Calling Post File");
         HashMap<String, String> errMsg = new HashMap<>();
 
@@ -111,7 +111,7 @@ public class FileController {
     public ResponseEntity<?> deleteImageById(HttpServletRequest request, @PathVariable String bookId,
                                              @PathVariable String imgId) {
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Delete File");
+        statsd.incrementCounter("Calls - Delete File");
         logger.info("Calling Delete File");
         // check for authorization
         String header = request.getHeader("Authorization");

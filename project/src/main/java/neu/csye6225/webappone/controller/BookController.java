@@ -54,7 +54,7 @@ public class BookController {
     @GetMapping(produces = "application/json")
     public @ResponseBody ResponseEntity<?> getAllBooks() {
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Get All Books");
+        statsd.incrementCounter("Calls - Get All Books");
         logger.info("Calling Get All Books");
         List<Book> allBooks = bookService.findAll();
         statsd.recordExecutionTime("Api Response Time - Get All Books",System.currentTimeMillis() - startTime);
@@ -72,7 +72,7 @@ public class BookController {
     @GetMapping(value = "/{id}", produces = "application/json")
     public @ResponseBody ResponseEntity<?> getBookById(@PathVariable String id) {
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Get Book By Id");
+        statsd.incrementCounter("Calls - Get Book By Id");
         logger.info("Calling Get Book By Id");
         // check for book id validity
         Book book = bookService.findById(id);
@@ -94,7 +94,7 @@ public class BookController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBookById(HttpServletRequest request, @PathVariable String id) throws Exception{
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Delete Book By Id");
+        statsd.incrementCounter("Calls - Delete Book By Id");
         logger.info("Calling Delete Book");
         // check for authorization
         String header = request.getHeader("Authorization");
@@ -134,7 +134,7 @@ public class BookController {
     public @ResponseBody ResponseEntity<?> createBook(HttpServletRequest request,
                                                         @RequestBody String jsonBook) throws JsonProcessingException {
         long startTime = System.currentTimeMillis();
-        statsd.increment("Calls - Post Book");
+        statsd.incrementCounter("Calls - Post Book");
         logger.info("Calling Post Book");                                                    
         // check for authorization
         String header = request.getHeader("Authorization");
