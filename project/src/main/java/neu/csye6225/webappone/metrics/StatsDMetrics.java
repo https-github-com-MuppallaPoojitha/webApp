@@ -21,7 +21,7 @@ public class StatsDMetrics {
 
     @Bean
     public StatsDClient metricsClient() {
-        logger.info("publish metrics: "+publishMetrics);
+        
         if(publishMetrics){
             return new NonBlockingStatsDClient("csye6225", host, port);
         }
