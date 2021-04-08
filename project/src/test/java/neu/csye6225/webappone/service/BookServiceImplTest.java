@@ -1,6 +1,7 @@
 package neu.csye6225.webappone.service;
 
 import com.timgroup.statsd.StatsDClient;
+import neu.csye6225.webappone.aws.SNSService;
 import neu.csye6225.webappone.dao.BookDao;
 import neu.csye6225.webappone.dao.UserDao;
 import neu.csye6225.webappone.pojo.Book;
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -40,10 +42,15 @@ public class BookServiceImplTest {
     @MockBean
     private BookDao bookDao;
     @MockBean
+    private UserDao userDao;
+    @MockBean
     private StatsDClient statsd;
+    @MockBean
+    private SNSService snsService;
 
     private Book book = new Book("Computer Networks",
             "Andrew S. Tanenbaum", "978-0132126953", "May, 2020");
+    private User user = new User("first", "last", "email", "password");
     List<Book> allBooks = new ArrayList();
 
     @Before
@@ -52,6 +59,7 @@ public class BookServiceImplTest {
         Mockito.when(bookDao.findById(book.getId())).thenReturn(book);
         Mockito.when(bookDao.save(book)).thenReturn(book);
         Mockito.when(bookDao.findAll()).thenReturn(allBooks);
+        Mockito.when(userDao.findById(book.getUser_id())).thenReturn(user);
     }
 
     @Test
@@ -71,5 +79,10 @@ public class BookServiceImplTest {
     public void findAllTest() {
         List<Book> allFoundBooks = bookService.findAll();
         assertEquals(allFoundBooks.size(), allBooks.size());
+    }
+
+    @Test
+    public void deleteTest() {
+        bookService.deleteById(book.getId());
     }
 }

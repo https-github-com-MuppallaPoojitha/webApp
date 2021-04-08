@@ -1,10 +1,13 @@
 package neu.csye6225.webappone.service;
 
-import neu.csye6225.webappone.dao.BookDao;
 import com.timgroup.statsd.StatsDClient;
 import neu.csye6225.webappone.pojo.Book;
+import neu.csye6225.webappone.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import neu.csye6225.webappone.dao.BookDao;
+import neu.csye6225.webappone.dao.UserDao;
+import neu.csye6225.webappone.aws.SNSService;
 
 import java.util.List;
 
@@ -14,12 +17,18 @@ public class BookServiceImpl implements BookService {
     private BookDao bookDao;
     @Autowired
     private StatsDClient statsd;
+    @Autowired
+    private SNSService snsService;
+    @Autowired
+    private UserDao userDao;
 
     @Override
     public Book save(Book book) {
         long startTime = System.currentTimeMillis();
         Book res = bookDao.save(book);
         statsd.recordExecutionTime("DB Response Time - Save Book", System.currentTimeMillis() - startTime);
+        String userEmail = userDao.findById(book.getUser_id()).getUsername();
+        snsService.postToTopic("POST", userEmail, book.getId(), book.getTitle(), book.getAuthor());
         return res;
     }
 
@@ -50,8 +59,11 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteById(String id) {
         long startTime = System.currentTimeMillis();
-        statsd.recordExecutionTime("DB Response Time - Delete Book", System.currentTimeMillis() - startTime);
+        Book book = bookDao.findById(id);
+        String userEmail = userDao.findById(book.getUser_id()).getUsername();
+        snsService.postToTopic("DELETE", userEmail, book.getId(), book.getTitle(), book.getAuthor());
         bookDao.deleteById(id);
+        statsd.recordExecutionTime("DB Response Time - Delete Book", System.currentTimeMillis() - startTime);
     }
 
 

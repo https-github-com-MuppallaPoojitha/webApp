@@ -61,6 +61,9 @@ public class Book {
         }
     }
 
+    public void setUser_id(String user_id) { this.user_id = user_id; }
+    public String getUser_id() { return this.user_id; }
+
     /**
      * This method serialize a Book object to a map.
      */

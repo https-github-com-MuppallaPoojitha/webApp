@@ -28,4 +28,12 @@ public class UserServiceImpl implements UserService {
         statsd.recordExecutionTime("DB Response Time - Find User By Username", System.currentTimeMillis() - startTime);
         return res;
     }
+    
+    @Override
+    public User findById(String id) {
+        long startTime = System.currentTimeMillis();
+        User res = userDao.findById(id);
+        statsd.recordExecutionTime("DB Response Time - Find User By Id", System.currentTimeMillis() - startTime);
+        return res;
+    }
 }
