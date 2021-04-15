@@ -38,7 +38,7 @@ public class SNSService {
         try {
             PublishRequest publishReq = new PublishRequest(topicArn,
                     requestType + "|" + recipientEmail + "|" + bookId  + "|" + bookName + "|" + author +  "|" +
-                    "http://prod.poojithamuppalla.me/books/" + bookId);
+                    "https://prod.poojithamuppalla.me/books/" + bookId);
             PublishResult result = snsClient.publish(publishReq);
             logger.info("Message "+ result.getMessageId() + " is successfully published to SNS Topic 'Notification_Email'.");
         } catch (AmazonSNSException e) {
